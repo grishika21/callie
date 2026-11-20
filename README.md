@@ -51,6 +51,10 @@ An AI agent on top of TalkTable for the bookstore's support team
   order number and last name with a fixed script, not a model. It then helps with **only their
   own** orders and tickets, and answers catalog questions through a TalkTable that has only the
   catalog configured. A browser "call" page runs the same call engine for demos.
+  **Status:** no live number yet, because we couldn't get a free Twilio number on our trial
+  account. The phone line is fully built and tested against a Twilio simulator: signed webhooks,
+  the Media Streams WebSocket and complete calls. Connecting a real number takes one setup
+  command once there is a number and a public host.
 
 ![The browser call: verified, then a catalog question answered by TalkTable](docs/callie-call.png)
 
@@ -402,8 +406,8 @@ space/, scripts/      the public demo package (Docker) and deploy / tunnel scrip
   in one answer.
 - Automatic charts for numeric results.
 - An "approve before run" mode that shows the query and runs it on confirmation.
-- Callie: host the live demo and a real phone number. The code is ready; it needs a host
-  with a public HTTPS address.
+- Callie: host the live demo, and connect a real Twilio number. The code is ready; it needs a
+  voice number and a host with a public HTTPS address.
 - Callie: a one-time code sent to the caller's contact details, on top of order number + last
   name.
 - Callie: a Docker Compose file for the whole Callie stack.

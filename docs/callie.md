@@ -164,6 +164,7 @@ Settings are in `.env.example` (sections "Callie").
 
 ## Hosting the phone line, and honest limits
 
+- **No live number yet.** We couldn't get a free Twilio number on our trial account, so the phone line isn't connected to a real number. It is fully built and tested: `tests/test_phone_gateway.py` and `eval/twilio_sim.py` run signed webhooks, the Media Streams WebSocket and complete calls the way Twilio sends them. To go live you need a voice number (`TWILIO_PHONE_NUMBER`) and a public HTTPS host. Then run `python -m callie.phone.setup --url https://<host>` once.
 - **Twilio must reach the gateway at a public HTTPS address.** A laptop needs a tunnel or a server. Office networks often block tunnels; this project's dev laptop does. Run the tunnel only where your network allows it.
 - **Hugging Face (Nov 2026):** free accounts can host only static Spaces. Docker and Gradio Spaces need a PRO subscription. `scripts/deploy_space.sh` deploys the demo in one command on such an account. Other free options are Google Cloud Run's free tier (it sleeps when unused) or a free cloud VM.
 - **Groq's free tier** has per-model limits (here: 1,000 requests/day and 8,000 tokens/minute). The demo spreads load over fallback models and says when it's busy.
