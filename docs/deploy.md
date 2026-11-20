@@ -1,5 +1,10 @@
 # Deploying TalkTable to a Hugging Face Space
 
+> **Note (November 2026):** Hugging Face now requires a PRO subscription for Gradio and Docker
+> Spaces; free accounts can host only static Spaces. Creating this Space on a free account fails
+> with "402 Payment Required". The steps below are unchanged on a PRO account. The same
+> app also runs on any host that runs Python or a container.
+
 The Space runs `app.py`: the chat UI plus a remote MCP server. A free CPU Space can't
 run an LLM or reach your laptop's Docker databases, so the deployed version uses:
 

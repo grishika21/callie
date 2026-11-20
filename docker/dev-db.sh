@@ -15,6 +15,7 @@ MONGO=talktable-mongo
 PG_ADMIN_PASSWORD="${POSTGRES_ADMIN_PASSWORD:-talktable_dev}"
 MONGO_ROOT_PASSWORD="${MONGO_ROOT_PASSWORD:-root_dev}"
 RO_PASSWORD="${TALKTABLE_RO_PASSWORD:-talktable_ro_dev}"
+DESK_PASSWORD="${TALKTABLE_DESK_PASSWORD:-talktable_desk_dev}"
 
 exists() { docker container inspect "$1" >/dev/null 2>&1; }
 
@@ -41,6 +42,7 @@ up() {
       -e POSTGRES_USER=talktable \
       -e POSTGRES_PASSWORD="$PG_ADMIN_PASSWORD" \
       -e TALKTABLE_RO_PASSWORD="$RO_PASSWORD" \
+      -e TALKTABLE_DESK_PASSWORD="$DESK_PASSWORD" \
       -p 127.0.0.1:5433:5432 \
       -v talktable-pgdata:/var/lib/postgresql/data \
       -v "$HERE/postgres-init.sh:/docker-entrypoint-initdb.d/10-readonly-user.sh:ro" \

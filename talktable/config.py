@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     mongo_url: SecretStr | None = None
     mongo_db: str = "bookstore"
 
+    # Which configured databases to use: "all", or a comma-separated list such as "sqlite".
+    # The Copilot's phone line runs a catalog-only TalkTable this way (DATABASES=sqlite), so
+    # callers' questions can't reach customer data. An unset URL already leaves a database
+    # out, but a blank one in the environment falls back to .env, so this is the reliable way.
+    databases: str = "all"
+
     # Write-capable URLs, used only by data/seed/*. The app never touches them.
     postgres_seed_url: SecretStr | None = None
     mongo_seed_url: SecretStr | None = None
@@ -89,6 +95,10 @@ class Settings(BaseSettings):
     max_rows: int = Field(default=200, ge=1, le=200)
     query_timeout_seconds: float = Field(default=5.0, gt=0, le=60)
     log_level: str = "INFO"
+
+    def database_enabled(self, name: str) -> bool:
+        wanted = {d.strip().lower() for d in self.databases.split(",") if d.strip()}
+        return "all" in wanted or name in wanted
 
     @property
     def cache_file(self) -> Path:

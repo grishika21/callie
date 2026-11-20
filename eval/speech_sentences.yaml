@@ -1,0 +1,21 @@
+# Support sentences for the speech round trip (Piper speaks them, whisper transcribes,
+# copilot/speech/text.py normalizes). `say` is what is spoken (ids as a person would say
+# them); `ids` must come back as digits and `keywords` as words.
+sentences:
+  - {say: "Where is order five five one two?", ids: [5512], keywords: [order]}
+  - {say: "Open a ticket for order fifty five twelve, the book arrived damaged.", ids: [5512], keywords: [ticket, damaged]}
+  - {say: "Has order seven eight eight eight been delivered yet?", ids: [7888], keywords: [delivered]}
+  - {say: "Did the customer get a refund for order three oh one one?", ids: [3011], keywords: [refund]}
+  - {say: "Open a payment ticket for order thirty seventy two, she was charged twice.", ids: [3072], keywords: [payment, charged]}
+  - {say: "Find the customer Travis Casey.", ids: [], keywords: [customer, travis]}
+  - {say: "Does customer eleven thirty nine have any open tickets?", ids: [1139], keywords: [open, tickets]}
+  - {say: "What is ticket forty two about?", ids: [42], keywords: [ticket]}
+  - {say: "How many delivery tickets are still open?", ids: [], keywords: [delivery, open]}
+  - {say: "Which carrier takes the longest, SwiftShip or ParcelPro?", ids: [], keywords: [swiftship, parcelpro]}
+  - {say: "The parcel from NorthStar Freight never arrived.", ids: [], keywords: [northstar, arrived]}
+  - {say: "Open a ticket for order six oh two oh, it is late.", ids: [6020], keywords: [late]}
+  - {say: "Make it urgent.", ids: [], keywords: [urgent]}
+  - {say: "Yes, go ahead.", ids: [], keywords: ["yes"]}
+  - {say: "No, cancel that.", ids: [], keywords: [cancel]}
+  - {say: "Change it to a refund ticket.", ids: [], keywords: [refund]}
+  - {say: "Look up order seventy seven eighty one please.", ids: [7781], keywords: [order]}

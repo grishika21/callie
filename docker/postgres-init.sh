@@ -1,6 +1,7 @@
 #!/bin/sh
 # Runs once, when the Postgres container is first created.
-# Creates the read-only login `talktable_ro` that the TalkTable app connects with.
+# Creates the read-only login `talktable_ro` that the TalkTable app connects with, and,
+# when TALKTABLE_DESK_PASSWORD is set, the Copilot Support Desk's login `talktable_desk`.
 set -eu
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
@@ -18,3 +19,17 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     ALTER ROLE talktable_ro SET default_transaction_read_only = on;
     ALTER ROLE talktable_ro SET statement_timeout = '5s';
 EOSQL
+
+# The Support Desk role gets no table rights here: the tables don't exist yet. The seed
+# script grants SELECT on 9 tables and INSERT on named support_tickets columns after it
+# creates them (data/seed/desk_role.py). No UPDATE, DELETE or TRUNCATE, ever.
+if [ -n "${TALKTABLE_DESK_PASSWORD:-}" ]; then
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \
+         -v desk_password="$TALKTABLE_DESK_PASSWORD" <<-'EOSQL'
+        CREATE ROLE talktable_desk LOGIN PASSWORD :'desk_password';
+        SELECT format('GRANT CONNECT ON DATABASE %I TO talktable_desk', current_database()) \gexec
+        GRANT USAGE ON SCHEMA public TO talktable_desk;
+        ALTER ROLE talktable_desk SET statement_timeout = '5s';
+        ALTER ROLE talktable_desk SET idle_in_transaction_session_timeout = '10s';
+EOSQL
+fi

@@ -8,6 +8,10 @@ The URL defaults to POSTGRES_SEED_URL (a user that can create tables). Only the 
 below are dropped and recreated; anything else in the database is left alone.
 `book_id` in order_items refers to books in the SQLite catalog. A foreign key can't
 span two databases, so that link is enforced by the generator instead.
+
+support_tickets.ticket_id is an identity column, so the Copilot's Support Desk can insert
+new tickets. The re-created tables lose their grants, so if the Support Desk role exists,
+its grants are applied again in the same transaction (see data/seed/desk_role.py).
 """
 
 from __future__ import annotations
@@ -21,6 +25,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     ForeignKey,
+    Identity,
     Integer,
     MetaData,
     Numeric,
@@ -34,7 +39,8 @@ from sqlalchemy import (
 
 from talktable.config import get_settings, mask_url
 from data.seed.common import print_counts, resolve_url
-from data.seed.extended import generate_sales_extras
+from data.seed.desk_role import DESK_ROLE, apply_desk_grants, role_exists
+from data.seed.extended import TICKET_CATEGORIES, TICKET_CHANNELS, TICKET_PRIORITIES, generate_sales_extras
 from data.seed.generate import ORDER_STATUSES, generate_sales
 
 metadata = MetaData()
@@ -150,15 +156,31 @@ loyalty_accounts = Table(
     CheckConstraint("tier IN ('bronze', 'silver', 'gold', 'platinum')", name="loyalty_tier_check"),
 )
 
+
+def _one_of(column: str, values: tuple[str, ...]) -> CheckConstraint:
+    return CheckConstraint(f"{column} IN (" + ", ".join(f"'{v}'" for v in values) + ")",
+                           name=f"support_tickets_{column}_check")
+
+
 support_tickets = Table(
     "support_tickets", metadata,
-    Column("ticket_id", Integer, primary_key=True, autoincrement=False),
+    # BY DEFAULT, so the seed can insert its own numbers; the desk role can't (column grants).
+    Column("ticket_id", Integer, Identity(), primary_key=True),
     Column("customer_id", Integer, ForeignKey("customers.customer_id"), nullable=False, index=True),
     Column("order_id", Integer, ForeignKey("orders.order_id"), index=True),
     Column("category", String(30), nullable=False),
-    Column("opened_at", DateTime, nullable=False),
+    Column("subject", String(120), nullable=False),
+    Column("description", String(2000), nullable=False),
+    Column("priority", String(10), nullable=False),
+    Column("channel", String(10), nullable=False),
+    # The database sets the time for new tickets; seconds, like the seeded ones.
+    Column("opened_at", DateTime, nullable=False, server_default=text("LOCALTIMESTAMP(0)")),
     Column("resolved_at", DateTime),
     Column("satisfaction", Integer),
+    Column("created_by", String(64)),  # Copilot staff username; NULL for seeded tickets
+    _one_of("category", TICKET_CATEGORIES),
+    _one_of("priority", TICKET_PRIORITIES),
+    _one_of("channel", TICKET_CHANNELS),
 )
 
 # Insert order: parents before children.
@@ -182,6 +204,14 @@ def seed(url: str) -> dict[str, int]:
             extras = generate_sales_extras()
             for table in EXTRA_TABLES:
                 conn.execute(table.insert(), extras[table.name])
+            # The seed chose its own ticket numbers: new tickets continue after them.
+            conn.execute(text("SELECT setval(pg_get_serial_sequence('support_tickets', 'ticket_id'), "
+                              "(SELECT max(ticket_id) FROM support_tickets))"))
+            if role_exists(conn):
+                apply_desk_grants(conn)
+                print(f"[postgres] re-applied the grants of {DESK_ROLE}")
+            else:
+                print(f"[postgres] no {DESK_ROLE} role: skipped its grants (python -m data.seed.desk_role)")
         with engine.connect() as conn:
             all_tables = (customers, orders, order_items, *EXTRA_TABLES)
             conn.execute(text("ANALYZE " + ", ".join(t.name for t in all_tables)))

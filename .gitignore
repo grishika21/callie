@@ -35,10 +35,15 @@ Thumbs.db
 .claude/
 
 # Answer cache (rebuilt automatically)
-data/answer_cache.sqlite*
+data/answer_cache*.sqlite*
 
 # Embedded Qdrant vector store (rebuilt automatically)
 data/qdrant/
 
 # Screenshot shared during development
 image.png
+
+# TalkTable Copilot: staff accounts, audit log, downloaded Piper voices
+data/copilot_users.yaml
+data/audit/
+data/voices/

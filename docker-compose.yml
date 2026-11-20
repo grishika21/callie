@@ -26,6 +26,8 @@ services:
       POSTGRES_USER: talktable
       POSTGRES_PASSWORD: ${TALKTABLE_PG_PASSWORD:-talktable_dev}
       TALKTABLE_RO_PASSWORD: ${TALKTABLE_RO_PASSWORD:-talktable_ro_dev}
+      # The Copilot's Support Desk login (insert-only on support_tickets); see docs/copilot_plan.md.
+      TALKTABLE_DESK_PASSWORD: ${TALKTABLE_DESK_PASSWORD:-talktable_desk_dev}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/postgres-init.sh:/docker-entrypoint-initdb.d/10-readonly-user.sh:ro

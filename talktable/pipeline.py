@@ -113,8 +113,9 @@ class TalkTable:
             adapter = self.adapters.get(name)
             if adapter is None:
                 self.index.remove_database(name)
-                self._status[name] = DatabaseStatus(**info, online=False,
-                                                    detail=f"not configured ({_URL_SETTING[name]} is not set)")
+                detail = (f"turned off (DATABASES={self.settings.databases})" if not self.settings.database_enabled(name)
+                          else f"not configured ({_URL_SETTING[name]} is not set)")
+                self._status[name] = DatabaseStatus(**info, online=False, detail=detail)
                 continue
             try:
                 if not adapter.ping():

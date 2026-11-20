@@ -33,13 +33,16 @@ __all__ = [
 def create_adapters(settings: Settings) -> dict[str, DatabaseAdapter]:
     """Build an adapter for every configured database, keyed by name.
 
-    A database whose URL isn't set is simply left out. Nothing connects here, so an
-    unreachable database never prevents start-up: use `ping()` to see what's online.
+    A database whose URL isn't set, or that DATABASES leaves out, is simply left out.
+    Nothing connects here, so an unreachable database never prevents start-up: use
+    `ping()` to see what's online.
     """
     limits = {"max_rows": settings.max_rows, "timeout_s": settings.query_timeout_seconds}
-    adapters: dict[str, DatabaseAdapter] = {"sqlite": SQLiteAdapter(settings.sqlite_file, **limits)}
-    if settings.postgres_url is not None:
+    adapters: dict[str, DatabaseAdapter] = {}
+    if settings.database_enabled("sqlite"):
+        adapters["sqlite"] = SQLiteAdapter(settings.sqlite_file, **limits)
+    if settings.postgres_url is not None and settings.database_enabled("postgres"):
         adapters["postgres"] = PostgresAdapter(settings.postgres_url.get_secret_value(), **limits)
-    if settings.mongo_url is not None:
+    if settings.mongo_url is not None and settings.database_enabled("mongo"):
         adapters["mongo"] = MongoAdapter(settings.mongo_url.get_secret_value(), settings.mongo_db, **limits)
     return adapters

@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import re
 import sqlite3
 from collections import defaultdict
 from contextlib import closing
@@ -19,7 +20,7 @@ import yaml
 
 from talktable.config import DESCRIPTIONS_PATH, get_settings
 from data.seed import generate as gen
-from data.seed.extended import generate_engagement_extras
+from data.seed.extended import TICKET_CATEGORIES, TICKET_PRIORITIES, generate_engagement_extras, generate_sales_extras
 from data.seed.seed_postgres import metadata as postgres_metadata
 
 
@@ -155,6 +156,22 @@ def test_sales_are_consistent() -> None:
 
     # The spec's Postgres demo question needs orders in every month of 2025.
     assert {o.order_date.month for o in sales.orders if o.order_date.year == 2025} == set(range(1, 13))
+
+
+def test_support_tickets_have_text_priority_and_channel() -> None:
+    tickets = generate_sales_extras()["support_tickets"]
+    assert [t["ticket_id"] for t in tickets] == list(range(1, len(tickets) + 1))
+    columns = postgres_metadata.tables["support_tickets"].columns
+    for ticket in tickets:
+        assert ticket["category"] in TICKET_CATEGORIES and ticket["priority"] in TICKET_PRIORITIES
+        assert ticket["channel"] in {"email", "chat", "phone"}  # "voice" means opened in the Copilot
+        assert ticket["created_by"] is None
+        for field in ("subject", "description"):
+            assert ticket[field].strip() and "{" not in ticket[field]
+            assert len(ticket[field]) <= columns[field].type.length
+        # Text that names an order names the ticket's own order.
+        mentioned = {int(n) for n in re.findall(r"order (\d+)", f"{ticket['subject']} {ticket['description']}")}
+        assert mentioned <= {ticket["order_id"]}
 
 
 def test_reviews_are_verified_purchases(reviews: list[dict[str, Any]]) -> None:

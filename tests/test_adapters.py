@@ -72,6 +72,15 @@ def test_create_adapters_skips_unconfigured_databases(monkeypatch: pytest.Monkey
     assert set(create_adapters(Settings(_env_file=None))) == {"sqlite"}
 
 
+def test_create_adapters_honours_the_allow_list() -> None:
+    """The Copilot's phone line: a catalog-only TalkTable, whatever URLs .env has."""
+    settings = Settings(_env_file=None, postgres_url="postgresql://u:p@localhost/x", mongo_url="mongodb://localhost",
+                        databases="sqlite")
+    assert set(create_adapters(settings)) == {"sqlite"}
+    assert set(create_adapters(settings.model_copy(update={"databases": "sqlite, Mongo"}))) == {"sqlite", "mongo"}
+    assert set(create_adapters(settings.model_copy(update={"databases": "all"}))) == {"sqlite", "postgres", "mongo"}
+
+
 def test_create_adapters_never_connects() -> None:
     started = time.perf_counter()
     adapters = create_adapters(Settings(_env_file=None, postgres_url="postgresql://u:p@203.0.113.1:5432/x",

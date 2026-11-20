@@ -19,10 +19,10 @@ from talktable.schema_index import SentenceEmbedder
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
-    """`live` tests call the real LLM (slow): run them with TALKTABLE_LIVE_TESTS=1."""
+    """`live` tests call the real LLM or load the speech models (slow): run them with TALKTABLE_LIVE_TESTS=1."""
     if os.environ.get("TALKTABLE_LIVE_TESTS") == "1":
         return
-    skip = pytest.mark.skip(reason="calls the real LLM: set TALKTABLE_LIVE_TESTS=1 to run")
+    skip = pytest.mark.skip(reason="slow (real LLM or speech models): set TALKTABLE_LIVE_TESTS=1 to run")
     for item in items:
         if "live" in item.keywords:
             item.add_marker(skip)

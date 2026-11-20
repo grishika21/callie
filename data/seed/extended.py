@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import random
 import re
+import string
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
@@ -106,6 +107,84 @@ WAREHOUSES = [  # name, city, country
     ("Pune Fulfillment Center", "Pune", "India"),
 ]
 TICKET_CATEGORIES = ("delivery", "payment", "damaged item", "refund", "account", "other")
+TICKET_PRIORITIES = ("low", "normal", "high", "urgent")
+# "voice" is never seeded: it marks tickets opened by staff through the TalkTable Copilot.
+TICKET_CHANNELS = ("email", "chat", "phone", "voice")
+_SEEDED_CHANNELS, _CHANNEL_WEIGHTS = ("email", "chat", "phone"), (45, 35, 20)
+_PRIORITY_WEIGHTS = {  # low, normal, high, urgent
+    "damaged item": (5, 45, 38, 12), "payment": (8, 47, 33, 12), "delivery": (10, 55, 28, 7),
+    "refund": (12, 58, 25, 5), "account": (30, 55, 12, 3), "other": (40, 52, 7, 1),
+}
+# (subject, description) per category. A template is used only when the ticket has every
+# value it mentions: tickets without an order get the ones without {order_id}.
+_TICKET_TEXT: dict[str, list[tuple[str, str]]] = {
+    "delivery": [
+        ("Order {order_id} has not arrived",
+         "Customer says order {order_id} should have arrived by now. {carrier} tracking has not "
+         "changed for {days} days."),
+        ("Parcel marked delivered but not received",
+         "{carrier} shows order {order_id} as delivered, but the customer says nothing arrived and "
+         "the neighbours have not seen it."),
+        ("Order {order_id} is late",
+         "Order {order_id} is {days} days past the estimated delivery date. The customer needs it for a gift."),
+        ("Order {order_id} has not shipped yet",
+         "Customer asks why order {order_id} has not been handed to a carrier yet."),
+        ("Change the delivery address",
+         "Customer used an old address for order {order_id} and asks whether {carrier} can redirect the parcel."),
+    ],
+    "payment": [
+        ("Charged twice for order {order_id}",
+         "Customer sees two charges of ${amount} for order {order_id} and asks for one to be reversed."),
+        ("Payment declined at checkout",
+         "The payment for order {order_id} was declined, although the customer's card works elsewhere."),
+        ("Unrecognised charge",
+         "Customer does not recognise a charge of ${amount} and wants to know which order it was for."),
+        ("Gift card balance looks wrong",
+         "Customer says their gift card balance is lower than it should be."),
+        ("Update the saved card",
+         "Customer wants to replace the expired card saved on their account."),
+    ],
+    "damaged item": [
+        ("{title} arrived damaged",
+         "The copy of \"{title}\" in order {order_id} arrived with a torn cover and bent pages."),
+        ("Water damage on delivery",
+         "The box for order {order_id} was wet when {carrier} delivered it, and \"{title}\" is warped."),
+        ("Pages missing from {title}",
+         "Customer reports pages missing from \"{title}\" (order {order_id}) and asks for a replacement."),
+        ("Damaged parcel",
+         "Order {order_id} arrived in a crushed box and one of the books has a cracked spine."),
+    ],
+    "refund": [
+        ("Refund not received for order {order_id}",
+         "Customer sent order {order_id} back {days} days ago and has not seen the ${amount} refund yet."),
+        ("Refund amount looks wrong",
+         "Customer expected ${amount} back for order {order_id} but received less."),
+        ("When will my refund arrive?",
+         "Order {order_id} was cancelled and the customer asks when the ${amount} will be returned."),
+    ],
+    "account": [
+        ("Cannot log in",
+         "Customer cannot log in, and the password reset email never arrives."),
+        ("Change the account email",
+         "Customer wants to change the email address on their account."),
+        ("Close my account",
+         "Customer asks for their account and saved addresses to be deleted."),
+        ("Loyalty points missing",
+         "Customer says the loyalty points from a recent order were never added to their account."),
+    ],
+    "other": [
+        ("Question about a pre-order",
+         "Customer asks when a pre-ordered title will ship."),
+        ("Gift wrapping",
+         "Customer would like gift wrapping and a message added to an order."),
+        ("Book suggestions for a reading group",
+         "Customer asks for book suggestions for a reading group of eight people."),
+        ("Bulk order enquiry",
+         "A school asks for a quote for 30 copies of the same book."),
+        ("Add a note to order {order_id}",
+         "Customer wants a note added to order {order_id} saying it is a gift."),
+    ],
+}
 CAMPAIGN_THEMES = ["New Releases", "Summer Reading", "Holiday Gift Guide", "Award Winners", "Staff Picks",
                    "Back to School", "Mystery Month", "Cozy Reads", "Big Ideas", "Kids' Corner"]
 _SEARCH_EXTRAS = ["gift ideas", "bestsellers", "new releases", "audiobooks", "books like harry potter",
@@ -361,6 +440,7 @@ def generate_sales_extras() -> dict[str, list[Row]]:
     support_tickets.sort(key=lambda t: t["opened_at"])
     for number, ticket in enumerate(support_tickets, start=1):
         ticket["ticket_id"] = number
+    _add_ticket_text(support_tickets, catalog, sales, shipments, carriers, items_by_order)
 
     return {"carriers": carriers, "payments": payments, "shipments": shipments, "returns": returns,
             "coupons": coupons, "order_coupons": order_coupons, "warehouses": warehouses, "inventory": inventory,
@@ -379,6 +459,39 @@ def _ticket(rng: random.Random, ticket_id: int, customer_id: int, order_id: int 
         satisfaction = max(1, min(5, base + rng.choice([-1, 0, 0, 0, 1])))
     return {"ticket_id": ticket_id, "customer_id": customer_id, "order_id": order_id, "category": category,
             "opened_at": opened, "resolved_at": resolved, "satisfaction": satisfaction}
+
+
+def _add_ticket_text(tickets: list[Row], catalog: Catalog, sales: Sales, shipments: list[Row],
+                     carriers: list[Row], items_by_order: dict[int, list[Any]]) -> None:
+    """Fill subject, description, priority, channel and created_by, in ticket_id order.
+
+    These draw from their own RNG (SEED + 13), so adding them changed no other value in any
+    table, including the older support_tickets columns.
+    """
+    rng = random.Random(SEED + 13)
+    titles = {b.book_id: b.title for b in catalog.books}
+    totals = {o.order_id: o.total_amount for o in sales.orders}
+    carrier_name = {c["carrier_id"]: c["name"] for c in carriers}
+    carrier_of = {s["order_id"]: carrier_name[s["carrier_id"]] for s in shipments}
+    for ticket in tickets:
+        order_id = ticket["order_id"]
+        values: dict[str, Any] = {"days": rng.randint(2, 12)}
+        if order_id is not None:
+            values |= {"order_id": order_id, "amount": totals[order_id],
+                       "title": titles[items_by_order[order_id][0].book_id]}
+            if order_id in carrier_of:
+                values["carrier"] = carrier_of[order_id]
+        usable = [t for t in _TICKET_TEXT[ticket["category"]] if _fields(t) <= values.keys()]
+        subject, description = rng.choice(usable)
+        ticket["subject"] = subject.format(**values)
+        ticket["description"] = description.format(**values)
+        ticket["priority"] = rng.choices(TICKET_PRIORITIES, weights=_PRIORITY_WEIGHTS[ticket["category"]])[0]
+        ticket["channel"] = rng.choices(_SEEDED_CHANNELS, weights=_CHANNEL_WEIGHTS)[0]
+        ticket["created_by"] = None  # set only for tickets opened in the Copilot
+
+
+def _fields(template: tuple[str, str]) -> set[str]:
+    return {name for part in template for _, name, _, _ in string.Formatter().parse(part) if name}
 
 
 # --- engagement (MongoDB) ----------------------------------------------------------
