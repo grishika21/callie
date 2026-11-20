@@ -61,7 +61,7 @@ HOW_IT_WORKS = """\
 - **Limits:** calls at once, calls per visitor per hour, call length. The data is fictional and resets when
   the demo restarts.
 
-Source and design notes: [github.com/grishika21/talktable](https://github.com/grishika21/talktable)
+Source and design notes: [github.com/grishika21/callie](https://github.com/grishika21/callie)
 """
 
 

@@ -106,8 +106,8 @@ server through `wsl.exe`.
          "command": "wsl.exe",
          "args": [
            "-d", "Ubuntu-20.04",
-           "-e", "/home/<you>/talktable/.venv/bin/python",
-           "/home/<you>/talktable/mcp_server.py"
+           "-e", "/home/<you>/callie/.venv/bin/python",
+           "/home/<you>/callie/mcp_server.py"
          ]
        }
      }
@@ -147,4 +147,4 @@ The server reads `.env` from the project folder, so the working directory doesn'
   `get_schema` + `run_sql` / `run_mongo`.
 - **Nothing happens at all.** Run the server by hand. It should sit there waiting
   for input (Ctrl+C to stop):
-  `wsl.exe -d Ubuntu-20.04 -e /home/<you>/talktable/.venv/bin/python /home/<you>/talktable/mcp_server.py`
+  `wsl.exe -d Ubuntu-20.04 -e /home/<you>/callie/.venv/bin/python /home/<you>/callie/mcp_server.py`

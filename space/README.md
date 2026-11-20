@@ -25,4 +25,4 @@ damaged, please open a ticket"*, *"Do you have any books by Erik Gross?"*, or so
 - **Demo data:** fictional, and it resets whenever this Space restarts. The Space sleeps when unused, so the
   first visit can take a minute.
 
-Code and design: [github.com/grishika21/talktable](https://github.com/grishika21/talktable)
+Code and design: [github.com/grishika21/callie](https://github.com/grishika21/callie)

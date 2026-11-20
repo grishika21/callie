@@ -32,7 +32,7 @@ from talktable.models import AskResult, DatabaseStatus
 logger = logging.getLogger(__name__)
 
 ACCENT = "#00D4AA"
-GITHUB_URL = "https://github.com/grishika21/talktable"
+GITHUB_URL = "https://github.com/grishika21/callie"
 LINKEDIN_URL = "https://www.linkedin.com/in/rishika-guggilam"
 
 ENGINE_NAMES = {"sqlite": "SQLite", "postgres": "PostgreSQL", "mongo": "MongoDB"}
