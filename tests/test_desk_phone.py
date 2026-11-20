@@ -16,8 +16,8 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 from mcp.types import CallToolResult
 
-from copilot.auth import TokenIssuer
-from copilot.desk.store import NewTicket
+from callie.auth import TokenIssuer
+from callie.desk.store import NewTicket
 from tests.desk_fakes import SECRET, Desk, running_desk
 
 pytestmark = pytest.mark.anyio

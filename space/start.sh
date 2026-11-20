@@ -23,5 +23,5 @@ TALKTABLE_DESK_PASSWORD="$DESK_PASSWORD" python -m data.seed.desk_role >/dev/nul
 unset POSTGRES_SEED_URL ADMIN_PASSWORD
 
 export DESK_POSTGRES_URL="postgresql://talktable_desk:${DESK_PASSWORD}@127.0.0.1:5432/bookstore"
-export COPILOT_JWT_SECRET="${COPILOT_JWT_SECRET:-$(secret)$(secret)}"
-exec python -m copilot.phone.space
+export CALLIE_JWT_SECRET="${CALLIE_JWT_SECRET:-$(secret)$(secret)}"
+exec python -m callie.phone.space

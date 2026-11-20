@@ -19,9 +19,9 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 from mcp.types import CallToolResult
 
-from copilot.config import CopilotSettings
-from copilot.desk.server import clean_text, create_server
-from copilot.desk.store import Category, Priority
+from callie.config import CallieSettings
+from callie.desk.server import clean_text, create_server
+from callie.desk.store import Category, Priority
 from data.seed.extended import TICKET_CATEGORIES, TICKET_PRIORITIES
 from tests.desk_fakes import PASSWORD, SECRET, Desk, running_desk
 
@@ -74,7 +74,7 @@ def _post(desk: Desk, token: str | None) -> httpx.Response:
 
 def _forge(desk: Desk, **overrides: Any) -> str:
     now = int(time.time())
-    claims = {"iss": "talktable-copilot", "aud": desk.settings.desk_url, "sub": "alice", "role": "agent",
+    claims = {"iss": "callie", "aud": desk.settings.desk_url, "sub": "alice", "role": "agent",
               "scope": "data:read desk:read tickets:write", "iat": now, "exp": now + 600, **overrides}
     return jwt.encode(claims, SECRET, algorithm="HS256")
 
@@ -269,7 +269,7 @@ async def test_audit_masks_emails(desk: Desk) -> None:
 
 
 def test_requires_a_database_url(tmp_path: Path) -> None:
-    settings = CopilotSettings(_env_file=None, copilot_jwt_secret=SECRET, desk_postgres_url=None,
-                               copilot_users_path=tmp_path / "u.yaml")
+    settings = CallieSettings(_env_file=None, callie_jwt_secret=SECRET, desk_postgres_url=None,
+                               callie_users_path=tmp_path / "u.yaml")
     with pytest.raises(SystemExit, match="DESK_POSTGRES_URL"):
         create_server(settings)

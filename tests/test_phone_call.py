@@ -1,4 +1,4 @@
-"""The phone call engine (copilot/phone/call.py) with a fake transport and fake speech,
+"""The phone call engine (callie/phone/call.py) with a fake transport and fake speech,
 the scripted model, and the real Support Desk (HTTP + tokens, in-memory store: customer
 1 Maria Gonzalez owns orders 5512 and 7781; customer 2 Sam Lee owns 6020)."""
 
@@ -12,16 +12,16 @@ from typing import Any
 import numpy as np
 import pytest
 
-from copilot.auth import TokenIssuer
-from copilot.phone import call as callmod
-from copilot.phone.agent import PhoneRuntime
-from copilot.phone.audio import FRAME_BYTES, SILENCE_BYTE, ulaw_encode
-from copilot.phone.call import CallSession, PhoneDeps, Timing
-from copilot.speech.stt import Transcript
-from copilot.speech.tts import Speech
+from callie.auth import TokenIssuer
+from callie.phone import call as callmod
+from callie.phone.agent import PhoneRuntime
+from callie.phone.audio import FRAME_BYTES, SILENCE_BYTE, ulaw_encode
+from callie.phone.call import CallSession, PhoneDeps, Timing
+from callie.speech.stt import Transcript
+from callie.speech.tts import Speech
 from tests.agent_fakes import ScriptedChatModel, call, say
 from tests.desk_fakes import SECRET, Desk, running_desk
-from tests.test_copilot_agent import ask
+from tests.test_callie_agent import ask
 
 pytestmark = pytest.mark.anyio
 

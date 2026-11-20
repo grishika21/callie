@@ -9,7 +9,7 @@ below are dropped and recreated; anything else in the database is left alone.
 `book_id` in order_items refers to books in the SQLite catalog. A foreign key can't
 span two databases, so that link is enforced by the generator instead.
 
-support_tickets.ticket_id is an identity column, so the Copilot's Support Desk can insert
+support_tickets.ticket_id is an identity column, so Callie's Support Desk can insert
 new tickets. The re-created tables lose their grants, so if the Support Desk role exists,
 its grants are applied again in the same transaction (see data/seed/desk_role.py).
 """
@@ -177,7 +177,7 @@ support_tickets = Table(
     Column("opened_at", DateTime, nullable=False, server_default=text("LOCALTIMESTAMP(0)")),
     Column("resolved_at", DateTime),
     Column("satisfaction", Integer),
-    Column("created_by", String(64)),  # Copilot staff username; NULL for seeded tickets
+    Column("created_by", String(64)),  # Callie staff username; NULL for seeded tickets
     _one_of("category", TICKET_CATEGORIES),
     _one_of("priority", TICKET_PRIORITIES),
     _one_of("channel", TICKET_CHANNELS),

@@ -27,15 +27,15 @@ from typing import Any
 
 import yaml
 
-from copilot.audit import AuditLog
-from copilot.phone.agent import PhoneRuntime
-from copilot.phone.audio import FRAME_BYTES, SILENCE_BYTE, PHONE_RATE, ulaw_encode, resample
-from copilot.phone.call import CallSession, PhoneDeps
-from copilot.phone.verify import last_name_of
-from copilot.speech.stt import WhisperTranscriber
-from copilot.speech.tts import PiperSpeaker
+from callie.audit import AuditLog
+from callie.phone.agent import PhoneRuntime
+from callie.phone.audio import FRAME_BYTES, SILENCE_BYTE, PHONE_RATE, ulaw_encode, resample
+from callie.phone.call import CallSession, PhoneDeps
+from callie.phone.verify import last_name_of
+from callie.speech.stt import WhisperTranscriber
+from callie.speech.tts import PiperSpeaker
 from data.seed import generate as gen
-from eval.benchmark_copilot import Harness
+from eval.benchmark_callie import Harness
 from eval.benchmark_phone_speech import spoken_digits
 from talktable.config import get_settings
 

@@ -1,5 +1,5 @@
 # Support sentences for the speech round trip (Piper speaks them, whisper transcribes,
-# copilot/speech/text.py normalizes). `say` is what is spoken (ids as a person would say
+# callie/speech/text.py normalizes). `say` is what is spoken (ids as a person would say
 # them); `ids` must come back as digits and `keywords` as words.
 sentences:
   - {say: "Where is order five five one two?", ids: [5512], keywords: [order]}

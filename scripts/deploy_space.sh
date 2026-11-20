@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Upload the phone-line demo to a Hugging Face Docker Space.
 #
-#   scripts/deploy_space.sh <hf-username>/talktable-copilot
+#   scripts/deploy_space.sh <hf-username>/callie
 #
 # Needs `hf auth login` first. Copies only what the Space needs (files git tracks or would
 # track: never .env, the users file, the audit log or caches) into a clean folder, puts
@@ -15,7 +15,7 @@ STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 
 git ls-files -z --cached --others --exclude-standard -- \
-    talktable copilot data mcp_server.py requirements.txt requirements-copilot.txt space LICENSE \
+    talktable callie data mcp_server.py requirements.txt requirements-callie.txt space LICENSE \
   | while IFS= read -r -d '' path; do
       [[ -f "$path" ]] && mkdir -p "$STAGE/$(dirname "$path")" && cp "$path" "$STAGE/$path"
     done
@@ -30,5 +30,5 @@ if [[ -n "${STAGE_ONLY:-}" ]]; then  # build the same files locally instead: STA
 fi
 echo "uploading $(find "$STAGE" -type f | wc -l) files to spaces/$REPO"
 "$HF" repo create "$REPO" --repo-type space --space-sdk docker --exist-ok >/dev/null
-"$HF" upload "$REPO" "$STAGE" . --repo-type space --commit-message "Deploy TalkTable Copilot phone demo"
+"$HF" upload "$REPO" "$STAGE" . --repo-type space --commit-message "Deploy the Callie phone demo"
 echo "https://huggingface.co/spaces/$REPO  ->  https://$(echo "$REPO" | tr '/' '-' | tr '[:upper:]' '[:lower:]').hf.space"

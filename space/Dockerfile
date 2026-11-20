@@ -1,4 +1,4 @@
-# TalkTable Copilot public demo: the customer phone line, in one Hugging Face Docker Space.
+# Callie public demo: the customer phone line, in one Hugging Face Docker Space.
 # Built from a clean copy of the repo by scripts/deploy_space.sh (this file becomes /Dockerfile).
 FROM python:3.11-slim
 
@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends postgresql \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY requirements.txt requirements-copilot.txt ./
-RUN pip install -r requirements-copilot.txt
+COPY requirements.txt requirements-callie.txt ./
+RUN pip install -r requirements-callie.txt
 
 # Models baked into the image: TalkTable's embeddings, Whisper base.en (the fallback when
 # Groq's speech-to-text is busy), and the Piper voice.
@@ -37,13 +37,13 @@ USER user
 
 # The demo's settings (secrets come from the Space's settings page: GROQ_API_KEY, and
 # for the phone line TWILIO_AUTH_TOKEN / TWILIO_ACCOUNT_SID). The models are measured in
-# docs/copilot_plan.md (H2).
+# docs/callie_plan.md (H2).
 ENV AGENT_PROVIDER=groq \
     AGENT_MODEL=openai/gpt-oss-120b \
     AGENT_REASONING_EFFORT=low \
     AGENT_FALLBACK_MODELS=openai/gpt-oss-20b@low,qwen/qwen3.8-27b@none \
     AGENT_MAX_RETRIES=1 \
-    COPILOT_TALKTABLE_LLM=default \
+    CALLIE_TALKTABLE_LLM=default \
     LLM_PROVIDER=groq \
     LLM_MODEL=qwen/qwen3.8-27b \
     PHONE_STT=groq \

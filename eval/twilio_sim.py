@@ -26,9 +26,9 @@ import numpy as np
 import websockets
 from twilio.request_validator import RequestValidator
 
-from copilot.phone.audio import FRAME_BYTES, PHONE_RATE, SILENCE_BYTE, from_phone, resample, ulaw_encode
-from copilot.speech.stt import WhisperTranscriber
-from copilot.speech.tts import PiperSpeaker
+from callie.phone.audio import FRAME_BYTES, PHONE_RATE, SILENCE_BYTE, from_phone, resample, ulaw_encode
+from callie.speech.stt import WhisperTranscriber
+from callie.speech.tts import PiperSpeaker
 
 LINES = ["My order number is five five one two.", "My last name is Virk.", "Where is my order?",
          "That's all, thank you. Goodbye!"]

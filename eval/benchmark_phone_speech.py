@@ -5,7 +5,7 @@
 
 Piper speaks what callers say (last names of real customers, order numbers, the V4
 support sentences, catalog questions); the audio goes through what the phone network
-does to it (8 kHz, μ-law, optional line noise); whisper transcribes it; the Copilot's own
+does to it (8 kHz, μ-law, optional line noise); whisper transcribes it; Callie's own
 helpers extract the order number and the last name, and match the name like the
 Support Desk will. Synthetic voices are clearer than real callers: an upper bound.
 """
@@ -20,11 +20,11 @@ from typing import Any
 
 import yaml
 
-from copilot.phone.audio import phone_line
-from copilot.phone.verify import extract_last_name, extract_order_number, last_name_of, names_match
-from copilot.speech.stt import WhisperTranscriber
-from copilot.speech.text import normalize_transcript
-from copilot.speech.tts import PiperSpeaker
+from callie.phone.audio import phone_line
+from callie.phone.verify import extract_last_name, extract_order_number, last_name_of, names_match
+from callie.speech.stt import WhisperTranscriber
+from callie.speech.text import normalize_transcript
+from callie.speech.tts import PiperSpeaker
 from data.seed import generate as gen
 from eval.benchmark_speech import SENTENCES, check
 

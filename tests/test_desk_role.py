@@ -183,4 +183,4 @@ def test_readonly_role_still_cannot_write_tickets(readonly: psycopg.Connection) 
 def test_readonly_role_reads_the_new_columns(readonly: psycopg.Connection) -> None:
     rows = attempt(readonly, "SELECT count(*), count(DISTINCT channel) FROM support_tickets "
                              "WHERE subject <> '' AND priority IS NOT NULL AND created_by IS NULL")
-    assert rows == [(SEEDED_TICKETS, 3)]  # the seeded tickets; the Copilot's have created_by set
+    assert rows == [(SEEDED_TICKETS, 3)]  # the seeded tickets; Callie's tickets have created_by set

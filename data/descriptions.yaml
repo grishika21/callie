@@ -565,14 +565,14 @@ databases:
           priority: "Urgency: 'low', 'normal', 'high' or 'urgent'."
           channel: >-
             How the ticket was opened: 'email', 'chat', 'phone' (a customer's call, including
-            the Copilot's phone line), or 'voice' (by support staff talking to the TalkTable
-            Copilot).
+            Callie's phone line), or 'voice' (by support staff talking to the TalkTable
+            Callie).
           opened_at: When the ticket was opened (TIMESTAMP).
           resolved_at: When it was resolved (TIMESTAMP); NULL while still open.
           satisfaction: Customer rating of the support, 1 (bad) to 5 (great); NULL if not rated.
           created_by: >-
-            Who opened it in the Copilot: a support staff member's username, or 'phone-agent'
-            for tickets the Copilot's phone line opened for a caller; NULL for older tickets.
+            Who opened it in Callie: a support staff member's username, or 'phone-agent'
+            for tickets Callie's phone line opened for a caller; NULL for older tickets.
         questions:
           - What is the average satisfaction per ticket category?
           - How many support tickets are still open?

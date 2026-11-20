@@ -1,4 +1,4 @@
-"""The public demo's browser call (copilot/phone/web.py): the same CallSession as a phone
+"""The public demo's browser call (callie/phone/web.py): the same CallSession as a phone
 call, fed from the page's microphone; fake speech, the scripted model, the real desk."""
 
 from __future__ import annotations
@@ -13,13 +13,13 @@ import gradio as gr
 import numpy as np
 import pytest
 
-from copilot.auth import TokenIssuer
-from copilot.phone.agent import PhoneRuntime
-from copilot.phone.call import PhoneDeps, Timing
-from copilot.phone.web import PhoneDemo, WebIO, build_demo
+from callie.auth import TokenIssuer
+from callie.phone.agent import PhoneRuntime
+from callie.phone.call import PhoneDeps, Timing
+from callie.phone.web import PhoneDemo, WebIO, build_demo
 from tests.agent_fakes import ScriptedChatModel, call, say
 from tests.desk_fakes import SECRET, Desk, running_desk
-from tests.test_copilot_agent import ask
+from tests.test_callie_agent import ask
 from tests.test_phone_call import Ears, Mouth
 
 pytestmark = pytest.mark.anyio

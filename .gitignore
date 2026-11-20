@@ -43,7 +43,7 @@ data/qdrant/
 # Screenshot shared during development
 image.png
 
-# TalkTable Copilot: staff accounts, audit log, downloaded Piper voices
-data/copilot_users.yaml
+# Callie: staff accounts, audit log, downloaded Piper voices
+data/callie_users.yaml
 data/audit/
 data/voices/

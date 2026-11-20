@@ -108,7 +108,7 @@ WAREHOUSES = [  # name, city, country
 ]
 TICKET_CATEGORIES = ("delivery", "payment", "damaged item", "refund", "account", "other")
 TICKET_PRIORITIES = ("low", "normal", "high", "urgent")
-# "voice" is never seeded: it marks tickets opened by staff through the TalkTable Copilot.
+# "voice" is never seeded: it marks tickets opened by staff through Callie.
 TICKET_CHANNELS = ("email", "chat", "phone", "voice")
 _SEEDED_CHANNELS, _CHANNEL_WEIGHTS = ("email", "chat", "phone"), (45, 35, 20)
 _PRIORITY_WEIGHTS = {  # low, normal, high, urgent
@@ -487,7 +487,7 @@ def _add_ticket_text(tickets: list[Row], catalog: Catalog, sales: Sales, shipmen
         ticket["description"] = description.format(**values)
         ticket["priority"] = rng.choices(TICKET_PRIORITIES, weights=_PRIORITY_WEIGHTS[ticket["category"]])[0]
         ticket["channel"] = rng.choices(_SEEDED_CHANNELS, weights=_CHANNEL_WEIGHTS)[0]
-        ticket["created_by"] = None  # set only for tickets opened in the Copilot
+        ticket["created_by"] = None  # set only for tickets opened in Callie
 
 
 def _fields(template: tuple[str, str]) -> set[str]:

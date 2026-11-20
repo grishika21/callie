@@ -1,4 +1,4 @@
-"""TalkTable Copilot's phone line: customers call a Twilio number and the Copilot answers.
+"""Callie's phone line: customers call a Twilio number and Callie answers.
 
     .venv/bin/python phone_server.py           gateway on http://127.0.0.1:8770
     scripts/phone_tunnel.sh                    the same, behind a Cloudflare quick tunnel,
@@ -7,7 +7,7 @@
 Needs TWILIO_AUTH_TOKEN (every request from Twilio is signature-checked) and, for the
 setup script, TWILIO_ACCOUNT_SID and TWILIO_PHONE_NUMBER. Starts the Support Desk in this
 process unless one is running, a catalog-only TalkTable (stdio), whisper and Piper.
-Details: docs/copilot_plan.md (Phone line).
+Details: docs/callie_plan.md (Phone line).
 """
 
 from __future__ import annotations
@@ -17,16 +17,16 @@ import sys
 
 import uvicorn
 
-from copilot.audit import AuditLog
-from copilot.config import get_copilot_settings
-from copilot.desk.launch import ensure_desk
-from copilot.phone.agent import PhoneRuntime
-from copilot.phone.call import PhoneDeps
-from copilot.phone.gateway import PhoneGateway, runtime_lifespan
-from copilot.speech.stt import WhisperTranscriber
-from copilot.speech.tts import make_speaker
+from callie.audit import AuditLog
+from callie.config import get_callie_settings
+from callie.desk.launch import ensure_desk
+from callie.phone.agent import PhoneRuntime
+from callie.phone.call import PhoneDeps
+from callie.phone.gateway import PhoneGateway, runtime_lifespan
+from callie.speech.stt import WhisperTranscriber
+from callie.speech.tts import make_speaker
 
-logger = logging.getLogger("copilot.phone")
+logger = logging.getLogger("callie.phone")
 
 
 def main() -> None:
@@ -35,13 +35,13 @@ def main() -> None:
     for noisy in ("httpx", "mcp", "faster_whisper", "sentence_transformers", "huggingface_hub",
                   "langchain_mcp_adapters", "uvicorn.access"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
-    settings = get_copilot_settings()
+    settings = get_callie_settings()
     if settings.twilio_auth_token is None:
         raise SystemExit("Set TWILIO_AUTH_TOKEN in .env (Twilio console > Account > API keys & tokens).")
     ensure_desk(settings)
 
     transcriber = WhisperTranscriber(settings.phone_stt_model)
-    speaker = make_speaker("piper", settings.copilot_tts_voice)
+    speaker = make_speaker("piper", settings.callie_tts_voice)
     transcriber.load()
     speaker.load()  # type: ignore[attr-defined]
     runtime = PhoneRuntime(settings)

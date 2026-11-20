@@ -16,12 +16,12 @@ from typing import Any
 
 import uvicorn
 
-from copilot.audit import AuditLog
-from copilot.auth import TokenIssuer, UserStore
-from copilot.config import CopilotSettings
-from copilot.desk.server import create_server
+from callie.audit import AuditLog
+from callie.auth import TokenIssuer, UserStore
+from callie.config import CallieSettings
+from callie.desk.server import create_server
 
-from copilot.desk.store import (
+from callie.desk.store import (
     CustomerMatches,
     CustomerSummary,
     NewTicket,
@@ -128,7 +128,7 @@ PASSWORD = "correct horse battery"
 @dataclass
 class Desk:
     url: str
-    settings: CopilotSettings
+    settings: CallieSettings
     store: FakeDeskStore
     users: UserStore
     audit: AuditLog
@@ -154,8 +154,8 @@ def _free_port() -> int:
 def running_desk(tmp: Path, **overrides: Any) -> Iterator[Desk]:
     """The real Support Desk server on a free port, with accounts alice (agent) and victor (viewer)."""
     port = _free_port()
-    settings = CopilotSettings(_env_file=None, copilot_jwt_secret=SECRET, desk_port=port,
-                               copilot_users_path=tmp / "users.yaml", copilot_audit_path=tmp / "audit.jsonl",
+    settings = CallieSettings(_env_file=None, callie_jwt_secret=SECRET, desk_port=port,
+                               callie_users_path=tmp / "users.yaml", callie_audit_path=tmp / "audit.jsonl",
                                **overrides)
     users = UserStore(settings.users_file)
     users.add("alice", PASSWORD, "agent")

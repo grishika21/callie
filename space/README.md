@@ -1,5 +1,5 @@
 ---
-title: TalkTable Copilot
+title: Callie
 emoji: 📞
 colorFrom: green
 colorTo: gray
@@ -10,7 +10,7 @@ license: mit
 short_description: Call an AI support agent for a bookstore by browser or phone
 ---
 
-# TalkTable Copilot: the bookstore's AI phone line
+# Callie: the bookstore's AI phone line
 
 Press **Record**, allow the microphone, and talk to the bookstore's phone assistant, or call the Twilio
 number if one is shown in the project's README.

@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     mongo_db: str = "bookstore"
 
     # Which configured databases to use: "all", or a comma-separated list such as "sqlite".
-    # The Copilot's phone line runs a catalog-only TalkTable this way (DATABASES=sqlite), so
+    # Callie's phone line runs a catalog-only TalkTable this way (DATABASES=sqlite), so
     # callers' questions can't reach customer data. An unset URL already leaves a database
     # out, but a blank one in the environment falls back to .env, so this is the reliable way.
     databases: str = "all"

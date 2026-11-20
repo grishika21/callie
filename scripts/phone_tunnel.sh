@@ -5,7 +5,7 @@
 #
 # 1. starts `cloudflared tunnel --url http://127.0.0.1:8770` (only the phone gateway is exposed;
 #    the staff web app and the Support Desk stay on 127.0.0.1), and waits for its https URL;
-# 2. points the Twilio number at it (python -m copilot.phone.setup; prints console steps if the
+# 2. points the Twilio number at it (python -m callie.phone.setup; prints console steps if the
 #    Twilio settings aren't in .env);
 # 3. runs phone_server.py with PHONE_PUBLIC_URL set. Ctrl-C stops both.
 # A quick tunnel's URL changes on every run; this script re-points the number each time.
@@ -35,5 +35,5 @@ done
 grep -q "Registered tunnel connection" "$LOG" || { echo "the tunnel didn't connect; its log:" >&2; cat "$LOG" >&2; exit 1; }
 echo "tunnel: $URL -> http://127.0.0.1:${PORT}"
 
-.venv/bin/python -m copilot.phone.setup --url "$URL"
+.venv/bin/python -m callie.phone.setup --url "$URL"
 PHONE_PUBLIC_URL="$URL" .venv/bin/python phone_server.py

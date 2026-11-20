@@ -1,7 +1,7 @@
 #!/bin/sh
 # Runs once, when the Postgres container is first created.
 # Creates the read-only login `talktable_ro` that the TalkTable app connects with, and,
-# when TALKTABLE_DESK_PASSWORD is set, the Copilot Support Desk's login `talktable_desk`.
+# when TALKTABLE_DESK_PASSWORD is set, Callie's Support Desk's login `talktable_desk`.
 set -eu
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL

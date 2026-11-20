@@ -6,10 +6,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from copilot.speech.confirm import parse_confirmation
-from copilot.speech.stt import to_mono_16k
-from copilot.speech.text import normalize_transcript, speakable
-from copilot.speech.tts import VOICES_DIR, PiperSpeaker, SilentSpeaker, make_speaker
+from callie.speech.confirm import parse_confirmation
+from callie.speech.stt import to_mono_16k
+from callie.speech.text import normalize_transcript, speakable
+from callie.speech.tts import VOICES_DIR, PiperSpeaker, SilentSpeaker, make_speaker
 
 
 @pytest.mark.parametrize(("heard", "meant"), [
@@ -103,7 +103,7 @@ def test_silent_speakers() -> None:
 @pytest.mark.skipif(not (VOICES_DIR / "en_US-lessac-medium.onnx").exists(), reason="Piper voice not downloaded")
 def test_endpointer_keeps_one_word_answers_and_ignores_clicks() -> None:
     """A bug found in the phone work: "Virk." (~0.25 s voiced) was dropped as too short."""
-    from copilot.speech.vad import Endpointer
+    from callie.speech.vad import Endpointer
 
     def heard(samples: np.ndarray, rate: int) -> bool:
         ep, found = Endpointer(end_silence=0.7), False

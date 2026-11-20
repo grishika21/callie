@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from copilot.speech.tts import VOICES_DIR
+from callie.speech.tts import VOICES_DIR
 from eval.benchmark_speech import run
 
 pytestmark = [pytest.mark.live,

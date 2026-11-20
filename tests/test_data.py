@@ -164,7 +164,7 @@ def test_support_tickets_have_text_priority_and_channel() -> None:
     columns = postgres_metadata.tables["support_tickets"].columns
     for ticket in tickets:
         assert ticket["category"] in TICKET_CATEGORIES and ticket["priority"] in TICKET_PRIORITIES
-        assert ticket["channel"] in {"email", "chat", "phone"}  # "voice" means opened in the Copilot
+        assert ticket["channel"] in {"email", "chat", "phone"}  # "voice" means opened in Callie
         assert ticket["created_by"] is None
         for field in ("subject", "description"):
             assert ticket[field].strip() and "{" not in ticket[field]

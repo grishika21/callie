@@ -1,5 +1,5 @@
 """Speech round trip: Piper speaks support sentences, whisper transcribes them, and the
-Copilot's normalizer turns spoken ids back into digits.
+Callie's normalizer turns spoken ids back into digits.
 
     python -m eval.benchmark_speech                       small.en and base.en
     python -m eval.benchmark_speech --models small.en --noise 15
@@ -21,9 +21,9 @@ from typing import Any
 import numpy as np
 import yaml
 
-from copilot.speech.stt import WhisperTranscriber
-from copilot.speech.text import normalize_transcript
-from copilot.speech.tts import PiperSpeaker
+from callie.speech.stt import WhisperTranscriber
+from callie.speech.text import normalize_transcript
+from callie.speech.tts import PiperSpeaker
 
 SENTENCES = Path(__file__).resolve().parent / "speech_sentences.yaml"
 

@@ -13,9 +13,9 @@ from collections.abc import Iterator
 import psycopg
 import pytest
 
-from copilot.config import CopilotSettings
-from copilot.desk.server import Caller, CreatedTicket, DeskService
-from copilot.desk.store import DeskUnavailableError, NewTicket, PostgresDeskStore
+from callie.config import CallieSettings
+from callie.desk.server import Caller, CreatedTicket, DeskService
+from callie.desk.store import DeskUnavailableError, NewTicket, PostgresDeskStore
 from talktable.config import Settings
 
 AGENT = Caller("pytest-desk", "agent", frozenset({"desk:read", "tickets:write"}))
@@ -30,7 +30,7 @@ def admin_url(settings: Settings) -> str:
 
 @pytest.fixture(scope="module")
 def store(admin_url: str) -> Iterator[PostgresDeskStore]:
-    url = CopilotSettings().desk_postgres_url
+    url = CallieSettings().desk_postgres_url
     if url is None:
         pytest.skip("DESK_POSTGRES_URL is not set")
     desk = PostgresDeskStore(url.get_secret_value(), connect_timeout_s=3)
@@ -108,7 +108,7 @@ def test_writer_inserts_and_finds_duplicates(store: PostgresDeskStore) -> None:
 
 def test_simultaneous_requests_create_one_ticket(store: PostgresDeskStore) -> None:
     """Two 'yes' clicks at once: the advisory lock lets only one of them write."""
-    service = DeskService(store, CopilotSettings(_env_file=None))
+    service = DeskService(store, CallieSettings(_env_file=None))
     order = store.get_order(1)
     assert order is not None
     start, results = threading.Barrier(4), []

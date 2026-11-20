@@ -1,4 +1,4 @@
-"""The Twilio gateway (copilot/phone/gateway.py): signed webhooks, TwiML, limits, and a call
+"""The Twilio gateway (callie/phone/gateway.py): signed webhooks, TwiML, limits, and a call
 over the Media Streams WebSocket, with fake speech, the scripted model and the real desk."""
 
 from __future__ import annotations
@@ -16,14 +16,14 @@ from starlette.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 from twilio.request_validator import RequestValidator
 
-from copilot.auth import TokenIssuer
-from copilot.phone.agent import PhoneRuntime
-from copilot.phone.audio import FRAME_BYTES, SILENCE_BYTE, ulaw_encode
-from copilot.phone.call import PhoneDeps, Timing
-from copilot.phone.gateway import PhoneGateway, caller_id, runtime_lifespan
+from callie.auth import TokenIssuer
+from callie.phone.agent import PhoneRuntime
+from callie.phone.audio import FRAME_BYTES, SILENCE_BYTE, ulaw_encode
+from callie.phone.call import PhoneDeps, Timing
+from callie.phone.gateway import PhoneGateway, caller_id, runtime_lifespan
 from tests.agent_fakes import ScriptedChatModel
 from tests.desk_fakes import SECRET, Desk, running_desk
-from tests.test_copilot_agent import ask
+from tests.test_callie_agent import ask
 from tests.test_phone_call import Ears, Mouth
 
 TOKEN, ACCOUNT, HOST = "test-auth-token", "AC0123", "phone.example"
