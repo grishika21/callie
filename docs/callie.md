@@ -89,7 +89,7 @@ sequenceDiagram
   G-->>C: "I'll open a damaged item ticket… Shall I go ahead?"
   C->>G: "Yes" (or keypad 1)
   G->>D: open_my_ticket runs: channel phone, created_by phone-agent
-  C->>G: "Any books by Erik Gross?"
+  C->>G: "Any books by Eric Gross?"
   A->>K: ask("…")
   K-->>A: five titles
   C->>G: "Goodbye"
@@ -155,6 +155,10 @@ python -m callie.cli --user <you> --say "Where is order 5512?"   # the same agen
 python phone_server.py           # gateway on 127.0.0.1:8770
 scripts/phone_tunnel.sh          # ...behind a Cloudflare quick tunnel, number pointed at it
 
+# The public demo on Streamlit Community Cloud (push-to-talk browser call; no phone line)
+#   share.streamlit.io: main file streamlit_demo/streamlit_app.py, Python 3.11, secret GROQ_API_KEY
+streamlit run streamlit_demo/streamlit_app.py
+
 # The public demo package (browser call + phone), as on a 2-CPU host
 STAGE_ONLY=/tmp/space scripts/deploy_space.sh x/y && docker build -t callie-demo /tmp/space
 docker run --cpus=2 -p 127.0.0.1:7870:7860 -e GROQ_API_KEY=... callie-demo
@@ -166,6 +170,7 @@ Settings are in `.env.example` (sections "Callie").
 
 - **No live number yet.** We couldn't get a free Twilio number on our trial account, so the phone line isn't connected to a real number. It is fully built and tested: `tests/test_phone_gateway.py` and `eval/twilio_sim.py` run signed webhooks, the Media Streams WebSocket and complete calls the way Twilio sends them. To go live you need a voice number (`TWILIO_PHONE_NUMBER`) and a public HTTPS host. Then run `python -m callie.phone.setup --url https://<host>` once.
 - **Twilio must reach the gateway at a public HTTPS address.** A laptop needs a tunnel or a server. Office networks often block tunnels; this project's dev laptop does. Run the tunnel only where your network allows it.
+- **Streamlit Community Cloud (free) runs the browser demo:** `streamlit_demo/streamlit_app.py`, push-to-talk through `callie/phone/push.py` (each recording is one turn of the same `CallSession`). The app starts its own PostgreSQL (`packages.txt`) with fresh demo data and the insert-only desk login. Streamlit can't serve Twilio's webhooks or stream audio both ways, so the phone line needs another host. In a copy of Community Cloud (Debian, uv, 2 CPUs, 2.7 GB) a full call passed with real Groq models: about 40 s to start, 1.5 GB of memory at most, and 0.4–4 s per turn.
 - **Hugging Face (Nov 2026):** free accounts can host only static Spaces. Docker and Gradio Spaces need a PRO subscription. `scripts/deploy_space.sh` deploys the demo in one command on such an account. Other free options are Google Cloud Run's free tier (it sleeps when unused) or a free cloud VM.
 - **Groq's free tier** has per-model limits (here: 1,000 requests/day and 8,000 tokens/minute). The demo spreads load over fallback models and says when it's busy.
 - **Verification by order number + last name is demo-grade.** Production should add a one-time code sent to the contact details on file.

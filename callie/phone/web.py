@@ -44,7 +44,7 @@ Press **Record** below (allow the microphone), then just talk, as on a phone cal
 
 **Demo customer:** order number **5512**, last name **Virk** (spell it if asked: V, I, R, K).
 Then try: *"Where is my order?"* · *"The book arrived damaged, please open a ticket."* (say *yes* or press **1**)
-· *"Do you have any books by Erik Gross?"* · *"What's the status of order 7888?"* (someone else's) · *"Goodbye."*
+· *"Do you have any books by Eric Gross?"* · *"What's the status of order 7888?"* (someone else's) · *"Goodbye."*
 
 The keypad works like a phone's: type the order number then **#**, **1** = yes, **2** = no, **0** = a person.
 """

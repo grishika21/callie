@@ -1,0 +1,11 @@
+# Streamlit settings for Callie's demo (streamlit_demo/streamlit_app.py).
+[theme]
+base = "dark"
+primaryColor = "#2ea043"
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = "none"
+
+[browser]
+gatherUsageStats = false

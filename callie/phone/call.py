@@ -31,7 +31,7 @@ import re
 
 from callie.phone.verify import extract_last_name, extract_order_number, extract_spelling
 from callie.session import CallieSession
-from callie.speech.stt import Transcriber
+from callie.speech.stt import Transcriber, to_mono_16k
 from callie.speech.text import speakable
 from callie.speech.tts import Speaker
 from callie.speech.vad import Endpointer
@@ -184,6 +184,32 @@ class CallSession:
         elif self.state == "help" and self.session is not None and self.session.pending is not None and digit in "12":
             self._spawn(self._handle_text("yes" if digit == "1" else "no", time.monotonic()))
 
+    async def on_utterance(self, mulaw: bytes) -> bool:
+        """A whole answer at once, for push-to-talk pages (the caller pressed stop): the same turn
+        as on a phone call, without waiting for a pause. The turn is finished when this returns.
+        Returns False, and sends nothing to Whisper, when the recording has no speech in it."""
+        if self.state in ("greeting", "ended") or self._busy:
+            return False
+        rate, pcm = from_phone(mulaw)
+        probe = Endpointer(end_silence=0.7)  # the phone line's own test for "is anyone talking?"
+        if probe.feed((rate, pcm)) is None and probe.feed((rate, np.zeros(rate, dtype=np.int16))) is None:
+            return False
+        self._activity = time.monotonic()
+        await self._handle(to_mono_16k((rate, pcm)), time.monotonic())
+        return True
+
+    async def on_text(self, text: str) -> None:
+        """Typed words, handled as if spoken (a demo page's box for visitors without a microphone).
+        The turn is finished when this returns."""
+        if self.state in ("greeting", "ended") or not text.strip():
+            return
+        self._activity = time.monotonic()
+        try:
+            await self._handle_text(text.strip(), time.monotonic())
+        except Exception:
+            logger.exception("call %s: typed turn failed", self.call_id[-6:])
+            await self.say("Sorry, something went wrong on my side. Could you say that again?")
+
     async def on_mark(self, name: str) -> None:
         if name == self._playing:
             self._playing = None
@@ -196,6 +222,11 @@ class CallSession:
     async def wait(self) -> str | None:
         await self._done.wait()
         return self.end_reason
+
+    @property
+    def keypad_digits(self) -> str:
+        """Digits typed so far for the order number (taken at # or after a pause)."""
+        return self._digits
 
     @property
     def idle(self) -> bool:

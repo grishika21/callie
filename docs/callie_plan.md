@@ -170,7 +170,8 @@ The usual gate applies after each phase: run the tests, show you the results, an
 - V0–V5 are done; the results are at the end of this file.
 - V5 also passed your own real-microphone run in the browser (you confirmed it on 2026-11-20).
 - P0–P3 (phone line) are done. P3's public-tunnel check and P4 (a real call) are blocked on this office laptop: the organization blocks tunnels.
-- H1–H2 (demo package, Groq) are done. **H3 is blocked:** Hugging Face now requires a PRO plan for Docker and Gradio Spaces (402 Payment Required; nothing was created). The public link is paused until a host is chosen; H4 waits for that and a Twilio account.
+- H1–H2 (demo package, Groq) are done. **H3 on Hugging Face is blocked:** it now requires a PRO plan for Docker and Gradio Spaces (402 Payment Required; nothing was created).
+- **H3 moved to Streamlit Community Cloud (2026-11-20, your choice):** a push-to-talk version of the browser call (`streamlit_demo/streamlit_app.py`, `callie/phone/push.py`, `callie/phone/demo_db.py`). See "Public demo results: Streamlit" at the end. The phone line can't run there; H4 needs a Twilio number (we couldn't get a free one) and a host with its own web routes.
 - V6, docs part: done (`docs/callie.md` with the architecture, the README section, this status). Still open: `docker-compose.callie.yml`.
 
 ## Spec deviations to approve
@@ -760,3 +761,22 @@ Piper spoke the lines; the audio went through 8 kHz μ-law (± 20 dB line noise)
   - The page doesn't listen while it speaks, so callers can't talk over a reply in the browser (they can on the phone).
   - The general hint can still bias Whisper toward shop words when the audio is unclear.
 - **Tests:** 786 passed, 5 skipped (slow).
+
+## Public demo results: Streamlit (2026-11-20)
+
+- **Why Streamlit:** Hugging Face needs PRO for Docker and Gradio Spaces. Streamlit Community Cloud is free and builds from the GitHub repo, but it runs only a Streamlit page: no custom web routes (so no Twilio webhooks) and no two-way audio streaming.
+- **Files:**
+  - `streamlit_demo/streamlit_app.py`: the page, with Call, a recorder, a keypad, a typed box, the transcript with every tool call, and the reply played automatically.
+  - `callie/phone/push.py`: push-to-talk calls. Each recording is one utterance for the same `CallSession` (8 kHz μ-law, the same verification, agent and guards); the replies come back as one clip. Limits: calls at once, calls per visitor per hour, call length.
+  - `callie/phone/call.py`: `on_utterance` (a whole recording is one answer, even with a pause in it; silence never reaches Whisper) and `on_text`.
+  - `callie/phone/demo_db.py`: the app's own PostgreSQL, as in `space/start.sh`.
+  - `streamlit_demo/requirements.txt` (no Gradio; the CPU-only torch wheel), `packages.txt` (`postgresql`), `.streamlit/config.toml` (no error details for visitors).
+- **Found and fixed:**
+  - The first TalkTable question took 40 s: its embedding model loads on first use. `PhoneRuntime.warm_up` now has TalkTable build its index at start, and the question takes 2–4 s.
+  - The demo's example said "Erik Gross", but the author is "Eric Gross". By voice Whisper heard "Eric", but typed it found nothing, so the example now has the real spelling.
+- **Checked in a copy of Community Cloud** (Debian bookworm, the requirements installed with uv, a non-root user, `--cpus=2 --memory=2.7g`, real Groq models), with Streamlit's AppTest:
+  - start: 38–55 s (Postgres and seed, desk, TalkTable index, Piper, Whisper base.en);
+  - Call → keypad 5512# → "Virk" → verified → "Where is my order?" (`my_order`, delivered) → "books by Eric Gross?" (five titles, 4.1 s) → order 7888 (not found) → damaged-book ticket → keypad 1 → ticket 1451 (`phone`, `phone-agent`) → "Goodbye";
+  - turns 0.4–4.1 s; memory at most 1.5 GB of 2.7 GB.
+- **Tests:** `tests/test_phone_push.py` (12), including the demo database (runs where PostgreSQL is installed).
+

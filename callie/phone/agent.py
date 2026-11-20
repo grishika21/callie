@@ -122,6 +122,7 @@ class PhoneRuntime:
         self.users = users or UserStore(settings.users_file)
         self._model_factory = model_factory or (lambda: make_model(settings))
         self._talktable_tools = talktable_tools
+        self._catalog_lister: BaseTool | None = None  # TalkTable's list_databases, for the warm-up
         self._issuer = issuer
         self._stack = AsyncExitStack()
         self.gateway: StaffUser | None = None
@@ -133,17 +134,27 @@ class PhoneRuntime:
             catalog = await open_talktable(self._stack, self.settings, databases="sqlite",
                                            extra_env={"CACHE_PATH": PHONE_CACHE})  # its own answer cache
             self._talktable_tools = [t for t in catalog if t.name == "ask"]
+            self._catalog_lister = next((t for t in catalog if t.name == "list_databases"), None)
         for t in self._talktable_tools:  # TalkTable's own description ("the bookstore's data") invites misuse
             if t.name == "ask":
                 t.description = CATALOG_ASK
 
     async def warm_up(self) -> float:
+        """Do now what the first call would wait for: connect to the model, and have TalkTable build
+        its schema index (its embedding model loads on first use: ~35 s on 2 CPUs). Returns the
+        model's time."""
         started = time.perf_counter()
         try:
             await self._model_factory().ainvoke("Reply with OK.")
         except Exception:
             logger.warning("model warm-up failed", exc_info=True)
-        return time.perf_counter() - started
+        took = time.perf_counter() - started
+        if self._catalog_lister is not None:
+            try:
+                await self._catalog_lister.ainvoke({})
+            except Exception:
+                logger.warning("TalkTable warm-up failed", exc_info=True)
+        return took
 
     async def close(self) -> None:
         await self._stack.aclose()

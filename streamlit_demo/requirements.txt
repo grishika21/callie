@@ -1,0 +1,40 @@
+# Callie on Streamlit Community Cloud (streamlit_demo/streamlit_app.py). Community Cloud uses
+# the dependency file next to the app first, so this one is used instead of the TalkTable
+# Space's requirements.txt. The pins match requirements.txt and requirements-callie.txt
+# (tests/test_streamlit_demo.py checks); left out: Gradio and pytest.
+streamlit==1.67.0
+
+# CPU-only PyTorch (sentence-transformers needs it; the default build is several GB).
+# Choose Python 3.11 in the app's advanced settings, so the small wheel is used.
+torch @ https://download.pytorch.org/whl/cpu/torch-2.14.1%2Bcpu-cp311-cp311-manylinux_2_28_x86_64.whl ; python_version == "3.11" and platform_machine == "x86_64"
+torch==2.14.1 ; python_version != "3.11" or platform_machine != "x86_64"
+
+# TalkTable
+pydantic==2.12.5
+pydantic-settings==2.15.0
+python-dotenv==1.2.4
+pyyaml==6.0.3
+sqlalchemy==2.1.4
+psycopg[binary]==3.3.6
+pymongo==4.18.3
+sqlglot==30.22.0
+pandas==3.0.6
+sentence-transformers==6.1.0
+numpy==2.4.6
+qdrant-client==1.19.1
+networkx==3.6.1
+openai==3.29.0
+mcp==1.30.0
+faker==40.43.0
+
+# Callie
+langchain==1.4.7
+langchain-core==1.8.3
+langgraph==1.2.23
+langchain-mcp-adapters==0.3.2
+langchain-ollama==1.1.0
+langchain-openai==1.7.3
+pyjwt==2.15.1
+twilio==9.13.0
+faster-whisper==1.2.1
+piper-tts==1.8.0

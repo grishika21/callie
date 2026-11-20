@@ -16,7 +16,7 @@ Press **Record**, allow the microphone, and talk to the bookstore's phone assist
 number if one is shown in the project's README.
 
 **Demo customer:** order **5512**, last name **Virk**. Try *"Where is my order?"*, *"The book arrived
-damaged, please open a ticket"*, *"Do you have any books by Erik Gross?"*, or someone else's order.
+damaged, please open a ticket"*, *"Do you have any books by Eric Gross?"*, or someone else's order.
 
 - **The call:** phone audio (8 kHz μ-law) → Whisper → a fixed verification script → an AI agent with tools
   over two MCP servers → Piper's voice.

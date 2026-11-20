@@ -47,3 +47,6 @@ image.png
 data/callie_users.yaml
 data/audit/
 data/voices/
+
+# Streamlit: local secrets (on Community Cloud they are set in the app settings)
+.streamlit/secrets.toml
